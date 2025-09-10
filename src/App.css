@@ -181,6 +181,29 @@
   margin: 0;
 }
 
+.selected-node-details .vector-container {
+  margin-top: 6px;
+  font-size: 10px;
+}
+
+.selected-node-details .vector-container small {
+  color: #6B7280;
+  font-weight: 500;
+}
+
+.selected-node-details .vector-display {
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 9px;
+  color: #6B7280;
+  display: inline-block;
+  padding: 1px 4px;
+  background-color: #f3f4f6;
+  border-radius: 3px;
+}
+
 .distance-info {
   margin-top: 8px;
   font-size: 11px;
@@ -380,4 +403,54 @@ canvas {
 
 canvas:active {
   cursor: grabbing;
+}
+
+/* Edge styling - disabled in 2D view */
+
+/* Debug Panel */
+.debug-panel {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  z-index: 15;
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #E5E7EB;
+  width: 320px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.debug-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #ef4444;
+}
+
+.debug-content {
+  font-size: 12px;
+}
+
+.edge-list {
+  margin-top: 8px;
+}
+
+.edge-list h4 {
+  font-size: 14px;
+  margin: 4px 0;
+}
+
+.edge-list ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.edge-list li {
+  padding: 4px 0;
+  border-bottom: 1px solid #f1f1f1;
+  word-break: break-all;
 }

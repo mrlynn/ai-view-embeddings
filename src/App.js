@@ -50,7 +50,12 @@ const CustomNode = ({ data }) => {
       <div className="node-label">{data.label}</div>
       <div className="node-category">{data.category}</div>
       <div className="node-vector">
-        {data.vector ? `[${data.vector.map(v => v.toFixed(2)).join(', ')}]` : ''}
+        {data.vector ? 
+          (data.vector.length > 5 ? 
+            `[${data.vector.slice(0, 2).map(v => v.toFixed(2)).join(', ')}, ...]` : 
+            `[${data.vector.map(v => v.toFixed(2)).join(', ')}]`
+          ) : ''
+        }
       </div>
     </div>
   );
@@ -72,6 +77,7 @@ export default function EmbeddingVisualizer() {
   const [isLoading, setIsLoading] = useState(false);
   const [customInput, setCustomInput] = useState('');
   const [showCustomInputForm, setShowCustomInputForm] = useState(false);
+  const [showDebugPanel, setShowDebugPanel] = useState(false);
   
   // References
   const graphRef = useRef(null);
@@ -127,47 +133,11 @@ export default function EmbeddingVisualizer() {
     return nodes;
   }, [embeddingData]);
 
-  // Calculate similarity edges
-  const calculateSimilarityEdges = useCallback((metric = distanceMetric) => {
-    const edges = [];
-    const maxDistance = {
-      euclidean: 2.0,  // Approximate max for our vectors
-      cosine: 1.0,     // Max cosine distance is 1
-      dot: 1.0         // Our normalized dot distance is [0,1]
-    };
-    
-    const thresholdDistance = threshold * maxDistance[metric];
-    
-    for (let i = 0; i < embeddingData.length; i++) {
-      for (let j = i + 1; j < embeddingData.length; j++) {
-        const item1 = embeddingData[i];
-        const item2 = embeddingData[j];
-        
-        if (!item1.vector || !item2.vector) continue;
-        
-        const distance = calculateDistance(item1.vector, item2.vector, metric);
-        
-        if (distance < thresholdDistance) {
-          const similarity = 1 - (distance / thresholdDistance);
-          edges.push({
-            id: `${item1.id}-${item2.id}`,
-            source: item1.id,
-            target: item2.id,
-            data: { 
-              distance: distance.toFixed(3),
-              metric: metric
-            },
-            style: { 
-              stroke: '#94a3b8', 
-              strokeWidth: Math.max(1, similarity * 3),
-              opacity: 0.6 
-            },
-          });
-        }
-      }
-    }
-    return edges;
-  }, [embeddingData, threshold, distanceMetric, calculateDistance]);
+  // Return empty edges array - no edge connections in 2D view
+  const calculateSimilarityEdges = useCallback(() => {
+    console.log("Edge connections disabled in 2D view");
+    return [];
+  }, []);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -183,40 +153,39 @@ export default function EmbeddingVisualizer() {
     return nodes.filter(node => node.data.category === selectedCategory);
   }, [nodes, selectedCategory]);
 
-  // Handle similarity toggle
+  // Handle similarity toggle - edges disabled in 2D view
   const handleSimilarityToggle = useCallback(() => {
-    if (!showSimilarity) {
-      setEdges(calculateSimilarityEdges(distanceMetric));
-    } else {
-      setEdges([]);
-    }
-    setShowSimilarity(!showSimilarity);
+    const newState = !showSimilarity;
+    setShowSimilarity(newState);
+    
+    // Toggle similarity state but don't create edges in 2D view
+    setTimeout(() => {
+      if (newState) {
+        console.log("Edge connections disabled in 2D view");
+        // Ensure no edges are shown
+        setEdges([]);
+        
+        // Remove any edge overlay containers that might exist
+        const overlayContainer = document.getElementById('edge-overlay-container');
+        if (overlayContainer) {
+          overlayContainer.remove();
+        }
+      } else {
+        console.log("Hiding similarity connections");
+        setEdges([]);
+        // Clear selected node when hiding similarity connections
+        setSelectedNode(null);
+      }
+    }, 10);
   }, [showSimilarity, calculateSimilarityEdges, distanceMetric, setEdges]);
 
-  // Handle node click in 2D view
+  // Simple node click handler - no edge creation
   const onNodeClick = useCallback((_, node) => {
     setSelectedNode(node);
-    
-    if (showSimilarity) {
-      // Highlight edges connected to this node
-      setEdges(prevEdges => 
-        prevEdges.map(edge => {
-          const isConnected = edge.source === node.id || edge.target === node.id;
-          return {
-            ...edge,
-            style: {
-              ...edge.style,
-              stroke: isConnected ? '#f59e0b' : '#94a3b8',
-              strokeWidth: isConnected ? 4 : edge.style.strokeWidth,
-              opacity: isConnected ? 1 : 0.3,
-              label: isConnected ? edge.data.distance : ''
-            },
-            label: isConnected ? edge.data.distance : ''
-          };
-        })
-      );
-    }
-  }, [showSimilarity, setEdges]);
+    console.log(`Node clicked: ${node.id}`);
+    // No edge creation in 2D view
+    setEdges([]);
+  }, [setEdges, showSimilarity, distanceMetric]);
 
   // Function to reset node positions in 2D view
   const handleResetPositions = useCallback(() => {
@@ -227,10 +196,8 @@ export default function EmbeddingVisualizer() {
       }))
     );
     
-    // Reset edges if similarity is shown
-    if (showSimilarity) {
-      setEdges(calculateSimilarityEdges(distanceMetric));
-    }
+    // No edges in 2D view
+    setEdges([]);
     
     // Clear selected node
     setSelectedNode(null);
@@ -428,7 +395,7 @@ export default function EmbeddingVisualizer() {
           z: (Math.random() - 0.5) * 300,
           category: categories[categoryIndex],
           color: colors[categoryIndex],
-          vector: item.embedding
+          vector: item.embedding // Keep full embedding data
         };
       });
       
@@ -601,6 +568,17 @@ export default function EmbeddingVisualizer() {
           </button>
         </div>
         
+        <div className="control-group">
+          <label className="control-checkbox">
+            <input
+              type="checkbox"
+              checked={showDebugPanel}
+              onChange={() => setShowDebugPanel(!showDebugPanel)}
+            />
+            <span className="checkbox-label">Show Edge Debug Panel</span>
+          </label>
+        </div>
+        
         {showCustomInputForm && (
           <form onSubmit={handleCustomTextSubmit} className="custom-input-form">
             <textarea
@@ -655,7 +633,15 @@ export default function EmbeddingVisualizer() {
             <p className="selected-node-details">
               <strong>{selectedNode.data.label}</strong><br/>
               Category: {selectedNode.data.category}<br/>
-              Vector: [{selectedNode.data.vector ? selectedNode.data.vector.map(v => v.toFixed(2)).join(', ') : ''}]
+              <div className="vector-container">
+                <small>Vector ({selectedNode.data.vector ? selectedNode.data.vector.length : 0} dimensions): </small>
+                <span className="vector-display">{selectedNode.data.vector ? 
+                  (selectedNode.data.vector.length > 5 ? 
+                    `[${selectedNode.data.vector.slice(0, 3).map(v => v.toFixed(2)).join(', ')}, ...]` : 
+                    `[${selectedNode.data.vector.map(v => v.toFixed(2)).join(', ')}]`
+                  ) : ''
+                }</span>
+              </div>
             </p>
             
             {showSimilarity && !is3DView && (
@@ -742,6 +728,24 @@ export default function EmbeddingVisualizer() {
         </div>
       </div>
 
+
+      {/* Debug Panel */}
+      {showDebugPanel && (
+        <div className="debug-panel">
+          <h3 className="debug-title">Edge Debug Info</h3>
+          <div className="debug-content">
+            <p><strong>Total Edges:</strong> {edges.length}</p>
+            <p><strong>Show Similarity:</strong> {showSimilarity ? 'Yes' : 'No'}</p>
+            <p><strong>Edge Connections:</strong> Disabled in 2D view (only available in 3D view)</p>
+            
+            <div className="edge-list">
+              <h4>Edge Details:</h4>
+              <p className="no-edges">Edge connections are disabled in 2D view. Switch to 3D view to see edge connections.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Visualization Area */}
       {isLoading && (
         <div className="loading-overlay">
@@ -758,9 +762,21 @@ export default function EmbeddingVisualizer() {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onNodeClick={onNodeClick}
+          onPaneClick={() => {
+            // Reset edges when clicking on the background if showing node connections
+            if (selectedNode && !showSimilarity) {
+              setEdges([]);
+              setSelectedNode(null);
+            }
+          }}
           nodeTypes={nodeTypes}
-          fitView
+          fitView={false}
           attributionPosition="bottom-right"
+          defaultEdgeOptions={{
+            type: 'straight',
+            animated: true,
+            style: { stroke: '#ff0000', strokeWidth: 3 }
+          }}
         >
           <Background color="#e2e8f0" gap={20} />
           <Controls />
