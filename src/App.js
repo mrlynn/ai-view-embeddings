@@ -154,6 +154,7 @@ export default function EmbeddingVisualizer() {
   }, [nodes, selectedCategory]);
 
   // Handle similarity toggle - edges disabled in 2D view
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleSimilarityToggle = useCallback(() => {
     const newState = !showSimilarity;
     setShowSimilarity(newState);
@@ -177,17 +178,19 @@ export default function EmbeddingVisualizer() {
         setSelectedNode(null);
       }
     }, 10);
-  }, [showSimilarity, calculateSimilarityEdges, distanceMetric, setEdges]);
+  }, [showSimilarity, setEdges]);
 
   // Simple node click handler - no edge creation
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const onNodeClick = useCallback((_, node) => {
     setSelectedNode(node);
     console.log(`Node clicked: ${node.id}`);
     // No edge creation in 2D view
     setEdges([]);
-  }, [setEdges, showSimilarity, distanceMetric]);
+  }, [setEdges]);
 
   // Function to reset node positions in 2D view
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleResetPositions = useCallback(() => {
     setNodes(nds => 
       nds.map(node => ({
@@ -201,7 +204,7 @@ export default function EmbeddingVisualizer() {
     
     // Clear selected node
     setSelectedNode(null);
-  }, [originalNodePositions, setNodes, showSimilarity, calculateSimilarityEdges, distanceMetric, setEdges]);
+  }, [originalNodePositions, setNodes, setEdges]);
 
   // Initialize and update 3D graph
   const initializeGraph3D = useCallback(() => {
