@@ -2,37 +2,382 @@
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Main container */
+.app-container {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  background: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+/* Control panel */
+.control-panel {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 10;
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #E5E7EB;
+  max-width: 280px;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.control-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  color: #374151;
+}
+
+.control-group {
+  margin-bottom: 12px;
+}
+
+.control-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 4px;
+}
+
+.control-select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.control-range {
+  width: 100%;
+}
+
+.control-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.view-toggle {
+  display: flex;
+  gap: 8px;
+}
+
+.control-button {
+  background-color: #3b82f6;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+}
+
+.control-button.active {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+.control-button:hover {
+  background-color: #2563eb;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.control-button:active {
+  background-color: #1d4ed8;
+  transform: translateY(1px);
+}
+
+.control-button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.control-button.add-concepts {
+  margin-top: 4px;
+}
+
+/* Info panel */
+.info-panel {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #E5E7EB;
+  max-width: 300px;
+}
+
+.info-title {
+  font-weight: bold;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.info-text {
+  font-size: 14px;
+  color: #6B7280;
+  margin-bottom: 8px;
+}
+
+.info-list {
+  font-size: 12px;
+  color: #6B7280;
+  margin: 0 0 12px 0;
+  padding-left: 16px;
+}
+
+.metric-explanation {
+  margin-top: 12px;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 8px;
+}
+
+.metric-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 6px 0;
+}
+
+.metric-details {
+  font-size: 12px;
+  color: #6B7280;
+}
+
+.metric-details p {
+  margin: 0 0 4px 0;
+}
+
+.selected-node-info {
+  margin-top: 12px;
+  padding: 8px;
+  background: #f9fafb;
+  border-radius: 6px;
+}
+
+.selected-node-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+}
+
+.selected-node-details {
+  font-size: 12px;
+  color: #6B7280;
+  margin: 0;
+}
+
+.distance-info {
+  margin-top: 8px;
+  font-size: 11px;
+}
+
+.distance-title {
+  font-size: 12px;
+  margin: 0 0 4px 0;
+  font-weight: 600;
+}
+
+.distance-list {
+  margin: 0;
+  padding: 0 0 0 12px;
+}
+
+/* Legend panel */
+.legend {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  z-index: 10;
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #E5E7EB;
+}
+
+.legend-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.legend-items {
+  margin-bottom: 10px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.legend-text {
+  font-size: 12px;
+}
+
+.current-metric {
+  margin-top: 10px;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 8px;
+}
+
+.metric-label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.metric-value {
+  font-size: 12px;
+}
+
+.threshold-value {
+  font-size: 10px;
+  color: #6B7280;
+  margin-top: 2px;
+}
+
+/* Custom node styling */
+.custom-node {
+  padding: 8px 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  border: 2px solid white;
+  background: white;
+  min-width: 80px;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.custom-node:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.node-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin: 0 auto 4px;
+}
+
+.node-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 2px;
+}
+
+.node-category {
+  font-size: 11px;
+  color: #6B7280;
+}
+
+.node-vector {
+  font-size: 8px;
+  color: #666;
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 3D graph container */
+.graph3d-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+}
+
+/* Custom form for entering concepts */
+.custom-input-form {
+  margin-top: 12px;
+}
+
+.custom-textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  font-size: 14px;
+  resize: vertical;
+  margin-bottom: 8px;
+}
+
+.control-button.submit {
+  background-color: #10b981;
+}
+
+.control-button.submit:hover {
+  background-color: #059669;
+}
+
+/* Loading overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.loading-spinner {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top: 4px solid white;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.loading-text {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Canvas styling */
+canvas {
+  cursor: grab;
+}
+
+canvas:active {
+  cursor: grabbing;
 }
