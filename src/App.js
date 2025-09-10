@@ -339,7 +339,6 @@ export default function EmbeddingVisualizer() {
       .linkDirectionalParticleColor(() => '#ffffff')
       .onNodeClick(node => {
         // Highlight connections on click
-        const links = Graph.graphData().links;
         Graph.linkColor(link => 
           (link.source.id === node.id || link.target.id === node.id) ? '#f59e0b' : '#94a3b8'
         );
@@ -377,12 +376,6 @@ export default function EmbeddingVisualizer() {
     Graph.cameraPosition({ x: 0, y: 0, z: 300 });
   }, [is3DView, selectedCategory, showSimilarity, distanceMetric, threshold, embeddingData, calculateDistance]);
   
-  // Update 3D graph when filters change
-  const updateGraph3D = useCallback((category = selectedCategory, metric = distanceMetric, customThreshold = threshold) => {
-    if (!is3DView || !graph3DInstanceRef.current) return;
-    
-    initializeGraph3D();
-  }, [is3DView, selectedCategory, distanceMetric, threshold, initializeGraph3D]);
   
   // Reset 3D graph to original positions
   const resetGraph3D = useCallback(() => {
@@ -505,7 +498,7 @@ export default function EmbeddingVisualizer() {
             onChange={(e) => {
               setSelectedCategory(e.target.value);
               if (is3DView) {
-                updateGraph3D(e.target.value);
+                setTimeout(initializeGraph3D, 0);
               }
             }}
             className="control-select"
@@ -526,7 +519,7 @@ export default function EmbeddingVisualizer() {
               setDistanceMetric(e.target.value);
               if (showSimilarity) {
                 if (is3DView) {
-                  updateGraph3D(selectedCategory, e.target.value);
+                  setTimeout(initializeGraph3D, 0);
                 } else {
                   setEdges(calculateSimilarityEdges(e.target.value));
                 }
@@ -553,7 +546,7 @@ export default function EmbeddingVisualizer() {
               setThreshold(newThreshold);
               if (showSimilarity) {
                 if (is3DView) {
-                  updateGraph3D(selectedCategory, distanceMetric, newThreshold);
+                  setTimeout(initializeGraph3D, 0);
                 } else {
                   setEdges(calculateSimilarityEdges(distanceMetric));
                 }
@@ -572,11 +565,7 @@ export default function EmbeddingVisualizer() {
                 const newValue = !showSimilarity;
                 setShowSimilarity(newValue);
                 if (is3DView) {
-                  if (newValue) {
-                    updateGraph3D(selectedCategory, distanceMetric);
-                  } else {
-                    updateGraph3D(selectedCategory, null);
-                  }
+                  setTimeout(initializeGraph3D, 0);
                 } else {
                   handleSimilarityToggle();
                 }
@@ -695,7 +684,7 @@ export default function EmbeddingVisualizer() {
                   {graph3DInstanceRef.current.graphData().links
                     .filter(link => link.source.id === selectedNode.id || link.target.id === selectedNode.id)
                     .map((link, idx) => {
-                      const connectedId = link.source.id === selectedNode.id ? link.target.id : link.source.id;
+                      // Get the connected node
                       const connectedNode = link.source.id === selectedNode.id ? link.target : link.source;
                       return (
                         <li key={`3d-link-${idx}`}>
