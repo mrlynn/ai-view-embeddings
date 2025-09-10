@@ -194,7 +194,7 @@ export default function EmbeddingVisualizer() {
   }, [showSimilarity, calculateSimilarityEdges, distanceMetric, setEdges]);
 
   // Handle node click in 2D view
-  const onNodeClick = useCallback((event, node) => {
+  const onNodeClick = useCallback((_, node) => {
     setSelectedNode(node);
     
     if (showSimilarity) {
@@ -667,12 +667,18 @@ export default function EmbeddingVisualizer() {
                     .map(edge => {
                       const connectedId = edge.source === selectedNode.id ? edge.target : edge.source;
                       const connectedNode = nodes.find(n => n.id === connectedId);
-                      return (
-                        <li key={edge.id}>
-                          {connectedNode.data.label}: {edge.data.distance}
-                        </li>
-                      );
-                    })}
+                      return {
+                        id: edge.id,
+                        label: connectedNode.data.label,
+                        distance: parseFloat(edge.data.distance)
+                      };
+                    })
+                    .sort((a, b) => a.distance - b.distance)
+                    .map(item => (
+                      <li key={item.id}>
+                        {item.label}: {item.distance.toFixed(3)}
+                      </li>
+                    ))}
                 </ul>
               </div>
             )}
@@ -686,12 +692,18 @@ export default function EmbeddingVisualizer() {
                     .map((link, idx) => {
                       // Get the connected node
                       const connectedNode = link.source.id === selectedNode.id ? link.target : link.source;
-                      return (
-                        <li key={`3d-link-${idx}`}>
-                          {connectedNode.name}: {link.distance.toFixed(3)}
-                        </li>
-                      );
-                    })}
+                      return {
+                        id: `3d-link-${idx}`,
+                        label: connectedNode.name,
+                        distance: link.distance
+                      };
+                    })
+                    .sort((a, b) => a.distance - b.distance)
+                    .map(item => (
+                      <li key={item.id}>
+                        {item.label}: {item.distance.toFixed(3)}
+                      </li>
+                    ))}
                 </ul>
               </div>
             )}
